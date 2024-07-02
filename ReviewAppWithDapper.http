@@ -1,0 +1,6 @@
+@ReviewAppWithDapper_HostAddress = http://localhost:5207
+
+GET {{ReviewAppWithDapper_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
