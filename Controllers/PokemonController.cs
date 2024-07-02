@@ -31,7 +31,7 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var pokemons = await _pokemonRepository.GetPokemons();
-            var pokemonDTOs = pokemons.Select(pokemon => new PokemonDTO(pokemon)).ToList();
+            var pokemonDTOs = pokemons.Select(pokemon => new PokemonDTO(pokemon.Name, pokemon.BirthDate)).ToList();
 
             return Ok(pokemonDTOs);
         }
@@ -49,7 +49,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var pokemon = await _pokemonRepository.GetPokemon(id);
-            var pokemonDTO = new PokemonDTO(pokemon);
+            var pokemonDTO = new PokemonDTO(pokemon.Name, pokemon.BirthDate);
 
             return Ok(pokemonDTO);
         }

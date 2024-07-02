@@ -8,10 +8,10 @@ namespace ReviewAppWithDapper.DTOs
 
         public DateOnly BirthDate { get; set; }
 
-        public PokemonDTO(Pokemon pokemon)
+        public PokemonDTO(string name, DateOnly birthDate)
         {
-            Name = pokemon.Name;
-            BirthDate = pokemon.BirthDate;
+            Name = name;
+            BirthDate = birthDate;
         }
 
         public Pokemon MapToEntity()

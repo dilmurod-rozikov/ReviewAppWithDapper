@@ -31,7 +31,7 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var reviews =await _reviewRepository.GetReviews();
-            var reviewDTOs = reviews.Select(review => new ReviewDTO(review)).ToList();
+            var reviewDTOs = reviews.Select(review => new ReviewDTO(review.Title, review.Description, review.Rating)).ToList();
 
             return Ok(reviewDTOs);
         }
@@ -49,7 +49,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var review = await _reviewRepository.GetReview(reviewId);
-            var reviewDTO = new ReviewDTO(review);
+            var reviewDTO = new ReviewDTO(review.Title, review.Description, review.Rating);
 
             return Ok(reviewDTO);
         }

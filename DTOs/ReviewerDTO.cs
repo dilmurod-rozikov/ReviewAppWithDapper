@@ -4,14 +4,17 @@ namespace ReviewAppWithDapper.DTOs
 {
     public class ReviewerDTO
     {
+        public int Id { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
-        public ReviewerDTO(Reviewer reviewer)
+        public ReviewerDTO(string firstName, string lastName, int id)
         {
-            FirstName = reviewer.FirstName;
-            LastName = reviewer.LastName;
+            FirstName = firstName;
+            LastName = lastName;
+            Id = id;
         }
 
         public Reviewer MapToEntity()

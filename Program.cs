@@ -12,7 +12,10 @@ builder.Services.AddScoped<IReviewerRepository, ReviewerRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 builder.Services.AddSingleton<SqlDataAccess>();
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.IncludeFields = true);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

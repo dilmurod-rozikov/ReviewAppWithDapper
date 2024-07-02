@@ -4,11 +4,14 @@ namespace ReviewAppWithDapper.DTOs
 {
     public class CountryDTO
     {
+        public int Id { get; set; }
+
         public string Name { get; set; }
 
-        public CountryDTO(Country country)
+        public CountryDTO(int id, string name)
         {
-            Name = country.Name;
+            Id = id;
+            Name = name;
         }
 
         public Country MapToEntity()

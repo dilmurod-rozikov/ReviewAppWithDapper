@@ -23,7 +23,7 @@ namespace ReviewApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
             var categories = await _categoryRepositry.GetCategories();
-            var categoryDTOs = categories.Select(category => new CategoryDTO(category)).ToList();
+            var categoryDTOs = categories.Select(category => new CategoryDTO(category.Name)).ToList();
             return Ok(categoryDTOs);
         }
 
@@ -40,7 +40,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var category = await _categoryRepositry.GetCategory(categoryId);
-            var categoryDTO = new CategoryDTO(category);
+            var categoryDTO = new CategoryDTO(category.Name);
 
             return Ok(categoryDTO);
         }

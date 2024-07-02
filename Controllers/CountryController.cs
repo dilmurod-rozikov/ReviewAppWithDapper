@@ -28,7 +28,7 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var countries = await _countryRepositry.GetCountries();
-            var countryDTOs = countries.Select(country => new CountryDTO(country)).ToList();
+            var countryDTOs = countries.Select(country => new CountryDTO(country.Id, country.Name)).ToList();
 
             return Ok(countryDTOs);
         }
@@ -48,7 +48,7 @@ namespace ReviewApp.Controllers
             var country = await
                 _countryRepositry.GetCountry(countryId);
 
-            var countryDTO = new CountryDTO(country);
+            var countryDTO = new CountryDTO(country.Id, country.Name);
 
             return Ok(countryDTO);
         }

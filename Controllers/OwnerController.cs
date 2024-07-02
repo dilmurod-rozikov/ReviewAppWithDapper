@@ -29,7 +29,7 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var owners = await _ownerRepository.GetOwners();
-            var ownerDTOs = owners.Select(owner => new OwnerDTO(owner)).ToList();
+            var ownerDTOs = owners.Select(owner => new OwnerDTO(owner.Name, owner.Gym)).ToList();
 
             return Ok(ownerDTOs);
         }
@@ -47,7 +47,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var owner = await _ownerRepository.GetOwner(ownerId);
-            var ownerDTO = new OwnerDTO(owner);
+            var ownerDTO = new OwnerDTO(owner.Name, owner.Gym);
 
             return Ok(ownerDTO);
         }
@@ -90,12 +90,16 @@ namespace ReviewApp.Controllers
                 ModelState.AddModelError("", "Owner already exists.");
                 return StatusCode(422, ModelState);
             }
+
             var owner = ownerDTO.MapToEntity();
+            owner.Country = await _countryRepository.GetCountry(countryId);
+
             if (! await _ownerRepository.CreateOwner(owner))
             {
                 ModelState.AddModelError("", "Something went wrong while saving");
                 return StatusCode(500, ModelState);
             }
+
             return NoContent();
         }
 

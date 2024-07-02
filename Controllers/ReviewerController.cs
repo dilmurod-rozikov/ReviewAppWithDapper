@@ -25,7 +25,10 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var reviewers = await _reviewerRepository.GetReviewers();
-            var reviewerDTOs = reviewers.Select(reviewer => new ReviewerDTO(reviewer)).ToList();
+            var reviewerDTOs = reviewers
+                .Select(reviewer => new ReviewerDTO(reviewer.FirstName, reviewer.LastName, reviewer.Id))
+                .ToList();
+
             return Ok(reviewerDTOs);
         }
 
@@ -42,7 +45,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var reviewer = await _reviewerRepository.GetReviewer(reviewerId);
-            var reviewerDTO = new ReviewerDTO(reviewer);
+            var reviewerDTO = new ReviewerDTO(reviewer.FirstName, reviewer.LastName, reviewer.Id);
             return Ok(reviewerDTO);
         }
 
@@ -77,6 +80,12 @@ namespace ReviewApp.Controllers
             var reviewerExists = reviewers
                 .Any(x => (x.LastName.Trim() + x.FirstName.Trim())
                 .Equals(trimmedReviewerName, StringComparison.OrdinalIgnoreCase));
+
+            if (reviewerExists)
+            {
+                ModelState.AddModelError("", "Reviewer already exists.");
+                return StatusCode(422, ModelState);
+            }
 
             var reviewer = reviewerDTO.MapToEntity();
             if (!await _reviewerRepository.CreateReviewer(reviewer))
