@@ -14,22 +14,6 @@ namespace ReviewApp.Repository
             _context = context;
         }
 
-        public async Task<bool> CreateOwner(Owner owner)
-        {
-            using IDbConnection db = _context.CreateConnection();
-            const string query = "INSERT INTO Owners (Name, Gym) VALUES (@Name, @Gym); SELECT SCOPE_IDENTITY();";
-            int rowsAffected = await db.ExecuteAsync(query, owner);
-            return rowsAffected > 0;
-        }
-
-        public async Task<bool> DeleteOwner(int id)
-        {
-            using IDbConnection db = _context.CreateConnection();
-            const string query = "DELETE FROM Owners WHERE Id = @Id";
-            int rowsAffected = await db.ExecuteAsync(query, new { Id = id });
-            return rowsAffected > 0;
-        }
-
         public async Task<Owner?> GetOwner(int id)
         {
             using IDbConnection db = _context.CreateConnection();
@@ -46,9 +30,25 @@ namespace ReviewApp.Repository
         public async Task<bool> OwnerExists(int ownerId)
         {
             using var db = _context.CreateConnection();
-            const string query = "SELECT * FROM Owners WHERE Id = @Id";
-            int count = await db.ExecuteScalarAsync<int>(query, new { Id = ownerId });
-            return count > 0;
+            const string query = "SELECT 1 FROM Owners WHERE Id = @Id";
+            var owner = await db.QueryFirstOrDefaultAsync<Owner>(query, new { Id = ownerId });
+            return owner != default;
+        }
+
+        public async Task<bool> CreateOwner(Owner owner)
+        {
+            using IDbConnection db = _context.CreateConnection();
+            const string query = "INSERT INTO Owners (Name, Gym) VALUES (@Name, @Gym);";
+            int rowsAffected = await db.ExecuteAsync(query, owner);
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> DeleteOwner(int id)
+        {
+            using IDbConnection db = _context.CreateConnection();
+            const string query = "DELETE FROM Owners WHERE Id = @Id";
+            int rowsAffected = await db.ExecuteAsync(query, new { Id = id });
+            return rowsAffected > 0;
         }
 
         public async Task<bool> UpdateOwner(Owner owner)
@@ -68,6 +68,5 @@ namespace ReviewApp.Repository
         {
             throw new NotImplementedException();
         }
-    
     }
 }

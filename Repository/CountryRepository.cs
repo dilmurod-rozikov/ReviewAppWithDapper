@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using ReviewApp.DataAccess;
 using ReviewApp.Interfaces;
 using ReviewApp.Models;
@@ -30,9 +31,9 @@ namespace ReviewApp.Repository
         public async Task<bool> CountryExists(int countryId)
         {
             using var db = _context.CreateConnection();
-            const string query = "SELECT * FROM Countries WHERE Id = @Id";
-            int count = await db.ExecuteScalarAsync<int>(query, new { Id = countryId });
-            return count > 0;
+            const string query = "SELECT 1 FROM Countries WHERE Id = @Id";
+            var country = await db.QueryFirstOrDefaultAsync<Country>(query, new { Id = countryId });
+            return country != default;
         }
 
         public async Task<bool> CreateCountry(Country country)
@@ -51,11 +52,11 @@ namespace ReviewApp.Repository
             return rowsAffected > 0;
         }
 
-        public async Task<bool> UpdateCountry(Country country)
+        public async Task<bool> UpdateCountry(int id, string name)
         {
             using IDbConnection db = _context.CreateConnection();
             const string query = "UPDATE Countries SET Name = @Name WHERE Id = @Id";
-            int rowsAffected = await db.ExecuteAsync(query, country);
+            int rowsAffected = await db.ExecuteAsync(query, new {Name = name, Id = id});
             return rowsAffected > 0;
         }
 

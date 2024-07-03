@@ -31,7 +31,9 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var pokemons = await _pokemonRepository.GetPokemons();
-            var pokemonDTOs = pokemons.Select(pokemon => new PokemonDTO(pokemon.Name, pokemon.BirthDate)).ToList();
+            var pokemonDTOs = pokemons
+                .Select(pokemon => new PokemonDTO(pokemon.Name, pokemon.BirthDate, pokemon.Id))
+                .ToList();
 
             return Ok(pokemonDTOs);
         }
@@ -49,7 +51,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var pokemon = await _pokemonRepository.GetPokemon(id);
-            var pokemonDTO = new PokemonDTO(pokemon.Name, pokemon.BirthDate);
+            var pokemonDTO = new PokemonDTO(pokemon.Name, pokemon.BirthDate, id);
 
             return Ok(pokemonDTO);
         }
@@ -80,6 +82,12 @@ namespace ReviewApp.Controllers
             if (pokemonDTO is null || !ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (!await _ownerRepository.OwnerExists(ownerId) ||
+                !await _categoryRepository.CategoryExists(categoryId))
+            {
+                return NotFound();
+            }
+
             var pokemons = await _pokemonRepository.GetPokemons();
             var pokemonExists = pokemons
                 .Any(x => x.Name.Trim().Equals(pokemonDTO.Name.Trim(), StringComparison.OrdinalIgnoreCase));
@@ -90,15 +98,12 @@ namespace ReviewApp.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            if (!await _ownerRepository.OwnerExists(ownerId) ||
-                !await _categoryRepository.CategoryExists(categoryId))
-            {
-                return NotFound(ModelState);
-            }
             var pokemon = pokemonDTO.MapToEntity();
-            if (! await _pokemonRepository.CreatePokemon(ownerId, categoryId, pokemon))
+
+            if (! await _pokemonRepository.CreatePokemon(pokemon))
             {
                 ModelState.AddModelError("", "Something went wrong while creating");
+                return StatusCode(500, ModelState);
             }
 
             return NoContent();
@@ -108,22 +113,20 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> UpdatePokemon(int pokemonId, [FromQuery] int ownerId,
-            [FromQuery] int categoryId, [FromBody] PokemonDTO pokemonDTO)
+        public async Task<ActionResult> UpdatePokemon(int pokemonId, [FromBody] PokemonDTO pokemonDTO)
         {
             if (pokemonDTO is null || !ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!await _pokemonRepository.PokemonExists(pokemonId) ||
-                !await _ownerRepository.OwnerExists(ownerId) ||
-                !await _categoryRepository.CategoryExists(categoryId))
+            if (!await _pokemonRepository.PokemonExists(pokemonId))
             {
                 return NotFound(ModelState);
             }
 
             var pokemon = pokemonDTO.MapToEntity();
+            pokemon.Id = pokemonId;
 
-            if (!await _pokemonRepository.UpdatePokemon(ownerId, categoryId, pokemon))
+            if (!await _pokemonRepository.UpdatePokemon(pokemon))
             {
                 ModelState.AddModelError("", "Something went wrong while updating");
                 return StatusCode(500, ModelState);

@@ -6,12 +6,15 @@ namespace ReviewAppWithDapper.DTOs
     {
         public string Name { get; set; }
 
-        public DateOnly BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
 
-        public PokemonDTO(string name, DateOnly birthDate)
+        public int Id { get; set; }
+
+        public PokemonDTO(string name, DateTime birthDate, int id)
         {
             Name = name;
             BirthDate = birthDate;
+            Id = id;
         }
 
         public Pokemon MapToEntity()

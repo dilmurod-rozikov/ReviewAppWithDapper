@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using ReviewApp.Interfaces;
 using ReviewApp.Models;
 using ReviewAppWithDapper.DTOs;
@@ -103,17 +104,15 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> UpdateCountry(int countryId, [FromBody] CountryDTO countryDTO)
+        public async Task<ActionResult> UpdateCountry(int countryId, [FromQuery] string name)
         {
-            if (countryDTO is null || !ModelState.IsValid)
+            if (name.IsNullOrEmpty() || !ModelState.IsValid)
                 return BadRequest(ModelState);
 
             if (! await _countryRepositry.CountryExists(countryId))
                 return NotFound(ModelState);
 
-            var country = countryDTO.MapToEntity();
-
-            if (! await _countryRepositry.UpdateCountry(country))
+            if (! await _countryRepositry.UpdateCountry(countryId, name))
             {
                 ModelState.AddModelError("", "Something went wrong while updating");
                 return StatusCode(500, ModelState);

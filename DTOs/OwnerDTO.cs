@@ -8,10 +8,13 @@ namespace ReviewAppWithDapper.DTOs
 
         public string Gym { get; set; }
 
-        public OwnerDTO(string name, string gym)
+        public int Id { get; set; }
+
+        public OwnerDTO(string name, string gym, int id)
         {
             Name = name;
             Gym = gym;
+            Id = id;
         }
 
         public Owner MapToEntity()

@@ -113,6 +113,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var reviewer = reviewerDTO.MapToEntity();
+            reviewer.Id = reviewerId;
 
             if (! await _reviewerRepository.UpdateReviewer(reviewer))
             {

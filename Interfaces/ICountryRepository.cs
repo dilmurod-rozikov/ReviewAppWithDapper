@@ -16,7 +16,7 @@ namespace ReviewApp.Interfaces
 
         public Task<bool> CreateCountry(Country country);
 
-        public Task<bool> UpdateCountry(Country country);
+        public Task<bool> UpdateCountry(int id, string name);
 
         public Task<bool> DeleteCountry(int id);
     }

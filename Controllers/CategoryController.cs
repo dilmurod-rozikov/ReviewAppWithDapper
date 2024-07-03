@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using ReviewApp.Interfaces;
 using ReviewApp.Models;
 using ReviewAppWithDapper.DTOs;
@@ -23,7 +24,7 @@ namespace ReviewApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
             var categories = await _categoryRepositry.GetCategories();
-            var categoryDTOs = categories.Select(category => new CategoryDTO(category.Name)).ToList();
+            var categoryDTOs = categories.Select(category => new CategoryDTO(category.Name, category.Id)).ToList();
             return Ok(categoryDTOs);
         }
 
@@ -40,7 +41,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var category = await _categoryRepositry.GetCategory(categoryId);
-            var categoryDTO = new CategoryDTO(category.Name);
+            var categoryDTO = new CategoryDTO(category.Name, category.Id);
 
             return Ok(categoryDTO);
         }
@@ -77,19 +78,15 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> UpdateCategory(int categoryId, [FromBody] CategoryDTO categoryDTO)
+        public async Task<IActionResult> UpdateCategory(int categoryId, [FromQuery] string name)
         {
-            if (categoryDTO is null)
-                return BadRequest(ModelState);
-
-            if (!ModelState.IsValid)
+            if (name.IsNullOrEmpty() || !ModelState.IsValid)
                 return BadRequest(ModelState);
 
             if (! await _categoryRepositry.CategoryExists(categoryId))
                 return NotFound(ModelState);
 
-            var category = categoryDTO.MapToEntity();
-            if(! await _categoryRepositry.UpdateCategory(category))
+            if(! await _categoryRepositry.UpdateCategory(name, categoryId))
             {
                 ModelState.AddModelError("", "Something went wrong while updating");
                 return StatusCode(500, ModelState);

@@ -6,9 +6,12 @@ namespace ReviewAppWithDapper.DTOs
     {
         public string Name { get; set; }
 
-        public CategoryDTO(string name)
+        public int Id { get; set; }
+
+        public CategoryDTO(string name, int id)
         {
             Name = name;
+            Id = id;
         }
 
         public Category MapToEntity()

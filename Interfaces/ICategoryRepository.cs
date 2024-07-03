@@ -12,7 +12,7 @@ namespace ReviewApp.Interfaces
 
         Task<bool> CreateCategory(Category category);
 
-        Task<bool> UpdateCategory(Category category);
+        Task<bool> UpdateCategory(string name, int categoryId);
 
         Task<bool> DeleteCategory(int id);
     }

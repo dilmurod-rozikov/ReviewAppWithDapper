@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReviewApp.Interfaces;
-using ReviewApp.Models;
 using ReviewAppWithDapper.DTOs;
 
 namespace ReviewApp.Controllers
@@ -29,7 +28,7 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var owners = await _ownerRepository.GetOwners();
-            var ownerDTOs = owners.Select(owner => new OwnerDTO(owner.Name, owner.Gym)).ToList();
+            var ownerDTOs = owners.Select(owner => new OwnerDTO(owner.Name, owner.Gym, owner.Id)).ToList();
 
             return Ok(ownerDTOs);
         }
@@ -47,7 +46,7 @@ namespace ReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var owner = await _ownerRepository.GetOwner(ownerId);
-            var ownerDTO = new OwnerDTO(owner.Name, owner.Gym);
+            var ownerDTO = new OwnerDTO(owner.Name, owner.Gym, owner.Id);
 
             return Ok(ownerDTO);
         }
@@ -116,6 +115,7 @@ namespace ReviewApp.Controllers
                 return NotFound(ModelState);
 
             var owner = ownerDTO.MapToEntity();
+            owner.Id = ownerId;
             if (! await _ownerRepository.UpdateOwner(owner))
             {
                 ModelState.AddModelError("", "Something went wrong while updating");

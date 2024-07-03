@@ -12,9 +12,9 @@ namespace ReviewApp.Interfaces
 
         Task<bool> PokemonExists(int id);
 
-        Task<bool> CreatePokemon(int ownerId, int categoryId, Pokemon pokemon);
+        Task<bool> CreatePokemon(Pokemon pokemon);
 
-        Task<bool> UpdatePokemon(int ownerId, int categoryId, Pokemon pokemon);
+        Task<bool> UpdatePokemon(Pokemon pokemon);
 
         Task<bool> DeletePokemon(int id);
     }

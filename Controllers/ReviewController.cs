@@ -31,25 +31,27 @@ namespace ReviewApp.Controllers
                 return BadRequest();
 
             var reviews =await _reviewRepository.GetReviews();
-            var reviewDTOs = reviews.Select(review => new ReviewDTO(review.Title, review.Description, review.Rating)).ToList();
+            var reviewDTOs = reviews
+                .Select(review => new ReviewDTO(review.Title, review.Description, review.Rating, review.Id))
+                .ToList();
 
             return Ok(reviewDTOs);
         }
 
-        [HttpGet("{reviewId}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(ReviewDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<ReviewDTO>> GetReview(int reviewId)
+        public async Task<ActionResult<ReviewDTO>> GetReview(int id)
         {
-            if (!await _reviewRepository.ReviewExists(reviewId))
+            if (!await _reviewRepository.ReviewExists(id))
                 return NotFound();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var review = await _reviewRepository.GetReview(reviewId);
-            var reviewDTO = new ReviewDTO(review.Title, review.Description, review.Rating);
+            var review = await _reviewRepository.GetReview(id);
+            var reviewDTO = new ReviewDTO(review.Title, review.Description, review.Rating, id);
 
             return Ok(reviewDTO);
         }
@@ -84,7 +86,7 @@ namespace ReviewApp.Controllers
             if (!await _reviewerRepository.ReviewerExists(reviewerId) ||
                 !await _pokemonRepository.PokemonExists(pokemonId))
             {
-                return NotFound(ModelState);
+                return NotFound();
             }
 
             var review = reviewDTO.MapToEntity();
@@ -114,6 +116,7 @@ namespace ReviewApp.Controllers
                 return NotFound(ModelState);
 
             var review = reviewDTO.MapToEntity();
+            review.Id = reviewId;
             if (!await _reviewRepository.UpdateReview(review))
             {
                 ModelState.AddModelError("", "Something went wrong while updating");

@@ -10,11 +10,14 @@ namespace ReviewAppWithDapper.DTOs
 
         public int Rating { get; set; }
 
-        public ReviewDTO(string title, string description, int rating)
+        public int Id { get; set; }
+
+        public ReviewDTO(string title, string description, int rating, int id)
         {
             Title = title;
             Description = description;
             Rating = rating;
+            Id = id;
         }
 
         public Review MapToEntity()

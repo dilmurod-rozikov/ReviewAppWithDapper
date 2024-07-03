@@ -14,22 +14,6 @@ namespace ReviewApp.Repository
             _context = context;
         }
 
-        public async Task<bool> CreateReview(Review review)
-        {
-            using IDbConnection db = _context.CreateConnection();
-            const string query = "INSERT INTO Reviews (Title, Description, Rating) VALUES (@Title, @Description, @Rating);";
-            int rowsAffected = await db.ExecuteAsync(query, review);
-            return rowsAffected > 0;
-        }
-
-        public async Task<bool> DeleteReview(int id)
-        {
-            using IDbConnection db = _context.CreateConnection();
-            const string query = "DELETE FROM Reviews WHERE Id = @Id";
-            int rowsAffected = await db.ExecuteAsync(query, new { Id = id });
-            return rowsAffected > 0;
-        }
-
         public async Task<Review?> GetReview(int id)
         {
             using IDbConnection db = _context.CreateConnection();
@@ -46,9 +30,25 @@ namespace ReviewApp.Repository
         public async Task<bool> ReviewExists(int reviewerId)
         {
             using var db = _context.CreateConnection();
-            const string query = "SELECT * FROM Reviews WHERE Id = @Id";
-            int count = await db.ExecuteScalarAsync<int>(query, new { Id = reviewerId });
-            return count > 0;
+            const string query = "SELECT 1 FROM Reviews WHERE Id = @Id";
+            var review = await db.QueryFirstOrDefaultAsync<Review>(query, new { Id = reviewerId });
+            return review != default;
+        }
+
+        public async Task<bool> CreateReview(Review review)
+        {
+            using IDbConnection db = _context.CreateConnection();
+            const string query = "INSERT INTO Reviews (Title, Description, Rating) VALUES (@Title, @Description, @Rating)";
+            int rowsAffected = await db.ExecuteAsync(query, review);
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> DeleteReview(int id)
+        {
+            using IDbConnection db = _context.CreateConnection();
+            const string query = "DELETE FROM Reviews WHERE Id = @Id";
+            int rowsAffected = await db.ExecuteAsync(query, new { Id = id });
+            return rowsAffected > 0;
         }
 
         public async Task<bool> UpdateReview(Review review)

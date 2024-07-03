@@ -30,9 +30,9 @@ namespace ReviewApp.Repository
         public async Task<bool> CategoryExists(int categoryId)
         {
             using var db = _context.CreateConnection();
-            const string query = "SELECT * FROM Categories WHERE Id = @Id";
-            int count = await db.ExecuteScalarAsync<int>(query, new { Id = categoryId });
-            return count > 0;
+            const string query = "SELECT 1 FROM Categories WHERE Id = @Id";
+            var category = await db.QueryFirstOrDefaultAsync<int>(query, new { Id = categoryId });
+            return category != default;
         }
 
         public async Task<bool> CreateCategory(Category category)
@@ -51,11 +51,11 @@ namespace ReviewApp.Repository
             return rowsAffected > 0;
         }
 
-        public async Task<bool> UpdateCategory(Category category)
+        public async Task<bool> UpdateCategory(string name, int categoryId)
         {
             using IDbConnection db = _context.CreateConnection();
             const string query = "UPDATE Categories SET Name = @Name WHERE Id = @Id";
-            int rowsAffected = await db.ExecuteAsync(query, category);
+            int rowsAffected = await db.ExecuteAsync(query, new {Name = name, Id = categoryId});
             return rowsAffected > 0;
         }
     }

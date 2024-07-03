@@ -14,6 +14,35 @@ namespace ReviewApp.Repository
             _context = context;
         }
 
+        public async Task<Reviewer?> GetReviewer(int id)
+        {
+            using IDbConnection db = _context.CreateConnection();
+            return await db.QueryFirstOrDefaultAsync<Reviewer>
+                ("SELECT * FROM Reviewers WHERE Id = @Id", new { Id = id });
+        }
+
+        public async Task<IEnumerable<Reviewer>> GetReviewers()
+        {
+            using var db = _context.CreateConnection();
+            return await db.QueryAsync<Reviewer>("SELECT * FROM Reviewers");
+        }
+
+        public async Task<bool> ReviewerExists(int reviewerId)
+        {
+            using var db = _context.CreateConnection();
+            const string query = "SELECT 1 FROM Reviewers WHERE Id = @Id";
+            var reviewer = await db.QueryFirstOrDefaultAsync<Reviewer>(query, new { Id = reviewerId });
+            return reviewer != default;
+        }
+
+        public async Task<bool> UpdateReviewer(Reviewer reviewer)
+        {
+            using IDbConnection db = _context.CreateConnection();
+            const string query = "UPDATE Reviewers SET FirstName = @FirstName, LastName = @LastName WHERE Id = @Id";
+            int rowsAffected = await db.ExecuteAsync(query, reviewer);
+            return rowsAffected > 0;
+        }
+
         public async Task<bool> CreateReviewer(Reviewer reviewer)
         {
             using IDbConnection db = _context.CreateConnection();
@@ -30,38 +59,10 @@ namespace ReviewApp.Repository
             return rowsAffected > 0;
         }
 
-        public async Task<Reviewer?> GetReviewer(int id)
-        {
-            using IDbConnection db = _context.CreateConnection();
-            return await db.QueryFirstOrDefaultAsync<Reviewer>
-                ("SELECT * FROM Reviewers WHERE Id = @Id", new { Id = id });
-        }
-
-        public async Task<IEnumerable<Reviewer>> GetReviewers()
-        {
-            using var db = _context.CreateConnection();
-            return await db.QueryAsync<Reviewer>("SELECT * FROM Reviewers");
-        }
-
         public async Task<IEnumerable<Review>> GetReviewsByReviewer(int id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> ReviewerExists(int reviewerId)
-        {
-            using var db = _context.CreateConnection();
-            const string query = "SELECT * FROM Reviewers WHERE Id = @Id";
-            int count = await db.ExecuteScalarAsync<int>(query, new { Id = reviewerId });
-            return count > 0;
-        }
-
-        public async Task<bool> UpdateReviewer(Reviewer reviewer)
-        {
-            using IDbConnection db = _context.CreateConnection();
-            const string query = "UPDATE Reviewers SET FirstName = @FirstName, LastName = @LastName WHERE Id = @Id";
-            int rowsAffected = await db.ExecuteAsync(query, reviewer);
-            return rowsAffected > 0;
-        }
     }
 }
