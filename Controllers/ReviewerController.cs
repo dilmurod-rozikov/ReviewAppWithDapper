@@ -21,9 +21,6 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<IEnumerable<ReviewerDTO>>> GetReviewers()
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var reviewers = await _reviewerRepository.GetReviewers();
             var reviewerDTOs = reviewers
                 .Select(reviewer => new ReviewerDTO(reviewer.FirstName, reviewer.LastName, reviewer.Id))
@@ -40,9 +37,6 @@ namespace ReviewApp.Controllers
         {
             if (! await _reviewerRepository.ReviewerExists(reviewerId))
                 return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var reviewer = await _reviewerRepository.GetReviewer(reviewerId);
             var reviewerDTO = new ReviewerDTO(reviewer.FirstName, reviewer.LastName, reviewer.Id);
@@ -72,7 +66,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult<Reviewer>> CreateReviewer([FromBody] ReviewerDTO reviewerDTO)
         {
-            if (reviewerDTO is null || !ModelState.IsValid)
+            if (reviewerDTO is null)
                 return BadRequest(ModelState);
 
             var trimmedReviewerName = reviewerDTO.LastName.Trim() + reviewerDTO.FirstName.Trim();
@@ -108,9 +102,6 @@ namespace ReviewApp.Controllers
 
             if (! await _reviewerRepository.ReviewerExists(reviewerId))
                 return NotFound(ModelState);
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var reviewer = reviewerDTO.MapToEntity();
             reviewer.Id = reviewerId;

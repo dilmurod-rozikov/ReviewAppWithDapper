@@ -8,7 +8,7 @@ namespace ReviewApp.Interfaces
 
         Task<Pokemon?> GetPokemon(int id);
 
-        Task<decimal> GetPokemonRating(int id);
+        Task<double> GetPokemonRating(int id);
 
         Task<bool> PokemonExists(int id);
 

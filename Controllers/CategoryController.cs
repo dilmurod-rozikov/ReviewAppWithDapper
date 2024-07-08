@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ReviewApp.Interfaces;
-using ReviewApp.Models;
 using ReviewAppWithDapper.DTOs;
 
 namespace ReviewApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : Controller
+    public class CategoriesController : Controller
     {
         private readonly ICategoryRepository _categoryRepositry;
-        public CategoryController(ICategoryRepository categoryRepositry)
+        public CategoriesController(ICategoryRepository categoryRepositry)
         {
             _categoryRepositry = categoryRepositry;
         }
@@ -21,10 +20,11 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories()
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
             var categories = await _categoryRepositry.GetCategories();
-            var categoryDTOs = categories.Select(category => new CategoryDTO(category.Name, category.Id)).ToList();
+            var categoryDTOs = categories
+                .Select(category => new CategoryDTO(category.Name, category.Id))
+                .ToList();
+
             return Ok(categoryDTOs);
         }
 
@@ -37,9 +37,6 @@ namespace ReviewApp.Controllers
             if (!await _categoryRepositry.CategoryExists(categoryId))
                 return NotFound();
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var category = await _categoryRepositry.GetCategory(categoryId);
             var categoryDTO = new CategoryDTO(category.Name, category.Id);
 
@@ -51,7 +48,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult> CreateCategory([FromBody] CategoryDTO categoryDTO)
         {
-            if (categoryDTO is null || !ModelState.IsValid)
+            if (categoryDTO is null)
                 return BadRequest(ModelState);
 
             var categories = await _categoryRepositry.GetCategories();
@@ -80,7 +77,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> UpdateCategory(int categoryId, [FromQuery] string name)
         {
-            if (name.IsNullOrEmpty() || !ModelState.IsValid)
+            if (name.IsNullOrEmpty())
                 return BadRequest(ModelState);
 
             if (! await _categoryRepositry.CategoryExists(categoryId))

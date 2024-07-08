@@ -25,11 +25,11 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<IEnumerable<CountryDTO>>> GetCountries()
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
 
             var countries = await _countryRepositry.GetCountries();
-            var countryDTOs = countries.Select(country => new CountryDTO(country.Id, country.Name)).ToList();
+            var countryDTOs = countries
+                .Select(country => new CountryDTO(country.Id, country.Name))
+                .ToList();
 
             return Ok(countryDTOs);
         }
@@ -42,9 +42,6 @@ namespace ReviewApp.Controllers
         {
             if (! await _countryRepositry.CountryExists(countryId))
                 return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var country = await
                 _countryRepositry.GetCountry(countryId);
@@ -76,7 +73,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult> CreateCountry([FromBody] CountryDTO countryDTO)
         {
-            if (countryDTO is null || !ModelState.IsValid)
+            if (countryDTO is null)
                 return BadRequest(ModelState);
 
             var countries = await _countryRepositry.GetCountries();
@@ -106,7 +103,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult> UpdateCountry(int countryId, [FromQuery] string name)
         {
-            if (name.IsNullOrEmpty() || !ModelState.IsValid)
+            if (name.IsNullOrEmpty())
                 return BadRequest(ModelState);
 
             if (! await _countryRepositry.CountryExists(countryId))

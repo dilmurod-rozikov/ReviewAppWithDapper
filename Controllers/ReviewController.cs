@@ -27,9 +27,6 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<IEnumerable<ReviewDTO>>> GetReviews()
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var reviews =await _reviewRepository.GetReviews();
             var reviewDTOs = reviews
                 .Select(review => new ReviewDTO(review.Title, review.Description, review.Rating, review.Id))
@@ -46,9 +43,6 @@ namespace ReviewApp.Controllers
         {
             if (!await _reviewRepository.ReviewExists(id))
                 return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var review = await _reviewRepository.GetReview(id);
             var reviewDTO = new ReviewDTO(review.Title, review.Description, review.Rating, id);
@@ -80,7 +74,7 @@ namespace ReviewApp.Controllers
         public async Task<ActionResult<Review>> CreateReview
             ([FromQuery]int pokemonId, [FromQuery] int reviewerId, [FromBody] ReviewDTO reviewDTO)
         {
-            if (reviewDTO is null|| !ModelState.IsValid)
+            if (reviewDTO is null)
                 return BadRequest(ModelState);
 
             if (!await _reviewerRepository.ReviewerExists(reviewerId) ||
@@ -109,7 +103,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult> UpdateReview(int reviewId, [FromBody] ReviewDTO reviewDTO)
         {
-            if (reviewDTO is null || !ModelState.IsValid)
+            if (reviewDTO is null)
                 return BadRequest(ModelState);
 
             if (!await _reviewRepository.ReviewExists(reviewId))

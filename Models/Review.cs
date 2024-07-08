@@ -13,5 +13,7 @@
         public Reviewer? Reviewer { get; set; }
 
         public Pokemon? Pokemon { get; set; }
+
+        public int PokemonId { get; set; }
     }
 }

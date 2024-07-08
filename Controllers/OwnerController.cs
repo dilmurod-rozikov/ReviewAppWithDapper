@@ -24,11 +24,11 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<IEnumerable<OwnerDTO>>> GetOwners()
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
 
             var owners = await _ownerRepository.GetOwners();
-            var ownerDTOs = owners.Select(owner => new OwnerDTO(owner.Name, owner.Gym, owner.Id)).ToList();
+            var ownerDTOs = owners
+                .Select(owner => new OwnerDTO(owner.Name, owner.Gym, owner.Id))
+                .ToList();
 
             return Ok(ownerDTOs);
         }
@@ -41,9 +41,6 @@ namespace ReviewApp.Controllers
         {
             if (! await _ownerRepository.OwnerExists(ownerId))
                 return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var owner = await _ownerRepository.GetOwner(ownerId);
             var ownerDTO = new OwnerDTO(owner.Name, owner.Gym, owner.Id);
@@ -74,7 +71,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult> CreateOwner([FromQuery] int countryId, [FromBody] OwnerDTO ownerDTO)
         {
-            if (ownerDTO is null || !ModelState.IsValid)
+            if (ownerDTO is null)
                 return BadRequest(ModelState);
 
             if (! await _countryRepository.CountryExists(countryId))
@@ -108,7 +105,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult> UpdateOwner(int ownerId, [FromBody] OwnerDTO ownerDTO)
         {
-            if (ownerDTO is null || !ModelState.IsValid)
+            if (ownerDTO is null)
                 return BadRequest(ModelState);
 
             if (! await _ownerRepository.OwnerExists(ownerId))

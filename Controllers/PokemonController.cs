@@ -27,9 +27,6 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<IEnumerable<PokemonDTO>>> GetPokemons()
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var pokemons = await _pokemonRepository.GetPokemons();
             var pokemonDTOs = pokemons
                 .Select(pokemon => new PokemonDTO(pokemon.Name, pokemon.BirthDate, pokemon.Id))
@@ -47,9 +44,6 @@ namespace ReviewApp.Controllers
             if (!await _pokemonRepository.PokemonExists(id))
                 return NotFound();
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var pokemon = await _pokemonRepository.GetPokemon(id);
             var pokemonDTO = new PokemonDTO(pokemon.Name, pokemon.BirthDate, id);
 
@@ -57,16 +51,13 @@ namespace ReviewApp.Controllers
         }
 
         [HttpGet("{id}/rating")]
-        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(200, Type = typeof(double))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<decimal>> GetPokemonRating(int id)
+        public async Task<ActionResult<double>> GetPokemonRating(int id)
         {
             if (!await _pokemonRepository.PokemonExists(id))
                 return NotFound();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var rating = await _pokemonRepository.GetPokemonRating(id);
 
@@ -79,7 +70,7 @@ namespace ReviewApp.Controllers
         public async Task<ActionResult> CreatePokemon
             ([FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] PokemonDTO pokemonDTO)
         {
-            if (pokemonDTO is null || !ModelState.IsValid)
+            if (pokemonDTO is null)
                 return BadRequest(ModelState);
 
             if (!await _ownerRepository.OwnerExists(ownerId) ||
@@ -115,7 +106,7 @@ namespace ReviewApp.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult> UpdatePokemon(int pokemonId, [FromBody] PokemonDTO pokemonDTO)
         {
-            if (pokemonDTO is null || !ModelState.IsValid)
+            if (pokemonDTO is null)
                 return BadRequest(ModelState);
 
             if (!await _pokemonRepository.PokemonExists(pokemonId))

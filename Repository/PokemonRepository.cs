@@ -27,13 +27,39 @@ namespace ReviewApp.Repository
             return await db.QueryAsync<Pokemon>("SELECT * FROM Pokemons");
         }
 
-        public async Task<decimal> GetPokemonRating(int id)
+        public async Task<double> GetPokemonRating(int id)
         {
             using IDbConnection db = _context.CreateConnection();
-            var pokemon = await db.QueryFirstOrDefaultAsync<Pokemon>
-                ("SELECT * FROM Pokemons WHERE Id = @Id", new { Id = id });
+            const string sql = @"SELECT p.Id AS PokemonId, r.Id AS ReviewId, r.Title, r.Description, r.Rating 
+                FROM Pokemons p 
+                JOIN Reviews r ON r.PokemonId = p.Id 
+                WHERE p.Id = @PokemonId";
 
-            return pokemon.Reviews.Sum(review => review.Rating) / pokemon.Reviews.Count();
+            var pokemonDictionary = new Dictionary<int, Pokemon>();
+            await db.QueryAsync<Pokemon, Review, Pokemon>(
+                sql,
+                (pokemon, review) =>
+                {
+                    if (!pokemonDictionary.TryGetValue(pokemon.Id, out var existingPokemon))
+                    {
+                        existingPokemon = pokemon;
+                        existingPokemon.Reviews = new List<Review>();
+                        pokemonDictionary.Add(existingPokemon.Id, existingPokemon);
+                    }
+                    existingPokemon.Reviews.Add(review);
+                    return existingPokemon;
+                },
+                new { PokemonId = id },
+                splitOn: "ReviewId"
+            );
+            var pokemon = pokemonDictionary.Values.FirstOrDefault();
+
+            if (pokemon != null && pokemon.Reviews.Any())
+            {
+                return pokemon.Reviews.Average(review => review.Rating);
+            }
+
+            return 0;
         }
 
         public async Task<bool> PokemonExists(int id)
