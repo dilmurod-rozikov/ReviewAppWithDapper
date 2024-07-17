@@ -58,15 +58,5 @@ namespace ReviewApp.Repository
             int rowsAffected = await db.ExecuteAsync(query, owner);
             return rowsAffected > 0;
         }
-
-        public async Task<IEnumerable<Owner>> GetOwnersOfAPokemon(int pokemonId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<Pokemon>> GetPokemonsByOwner(int ownerId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

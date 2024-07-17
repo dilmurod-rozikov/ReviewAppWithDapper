@@ -8,10 +8,6 @@ namespace ReviewApp.Interfaces
 
         Task<Owner?> GetOwner(int ownerId);
 
-        Task<IEnumerable<Owner>> GetOwnersOfAPokemon(int pokemonId);
-
-        Task<IEnumerable<Pokemon>> GetPokemonsByOwner(int ownerId);
-
         Task<bool> OwnerExists(int ownerId);
 
         Task<bool> CreateOwner(Owner owner);

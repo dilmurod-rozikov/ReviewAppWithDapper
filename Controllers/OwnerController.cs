@@ -48,24 +48,6 @@ namespace ReviewApp.Controllers
             return Ok(ownerDTO);
         }
 
-        //[HttpGet("{ownerId}/pokemon")]
-        //[ProducesResponseType(200, Type = typeof(Owner))]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(404)]
-        //public IActionResult GetPokemonByOwner(int ownerId)
-        //{
-        //    if (!_ownerRepository.OwnerExists(ownerId))
-        //        return NotFound();
-
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    var owner = _mapper
-        //        .Map<List<PokemonDTO>>(_ownerRepository.GetPokemonsByOwner(ownerId));
-
-        //    return Ok(owner);
-        //}
-
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
